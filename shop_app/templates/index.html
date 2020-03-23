@@ -1,0 +1,261 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!--Main layout-->
+<main>
+  <div class="container">
+
+    <!--Navbar-->
+    <nav class="navbar navbar-expand-lg navbar-dark elegant-color lighten-3 mt-3 mb-5">
+
+      <!-- Navbar brand -->
+      <span class="navbar-brand">Categories:</span>
+
+      <!-- Collapse button -->
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#basicExampleNav"
+        aria-controls="basicExampleNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <!-- Collapsible content -->
+      <div class="collapse navbar-collapse" id="basicExampleNav">
+
+        <!-- Links -->
+        <ul class="navbar-nav mr-auto">
+          {% if 'category' not in request.session %}
+          <li class="nav-item active">
+            <a class="nav-link" href="/filter/all/">All
+              <span class="sr-only">(current)</span>
+            </a>
+          </li>
+          {% else %}
+          <li class="nav-item">
+            <a class="nav-link" href="/filter/all/">All</a>
+          </li>
+          {% endif %}
+          <!-- Category 1 -->
+          {% if 'Shoe' in request.session.category %}
+          <li class="nav-item active">
+            <a class="nav-link" href="/filter/shoe/">Shoes
+              <span class="sr-only">(current)</span>
+            </a>
+          </li>
+          {% else %}
+          <li class="nav-item">
+            <a class="nav-link" href="/filter/shoe/">Shoes</a>
+          </li>
+          {% endif %}
+          <!-- Category 2 -->
+          {% if 'Hoodie' in request.session.category %}
+          <li class="nav-item active">
+            <a class="nav-link" href="/filter/hoodie/">Hoodies
+              <span class="sr-only">(current)</span>
+            </a>
+          </li>
+          {% else %}
+          <li class="nav-item">
+            <a class="nav-link" href="/filter/hoodie/">Hoodies</a>
+          </li>
+          {% endif %}
+          <!-- Category 3 -->
+          {% if 'Skatewear' in request.session.category %}
+          <li class="nav-item active">
+            <a class="nav-link" href="/filter/skatewear/">Skatewear
+              <span class="sr-only">(current)</span>
+            </a>
+          </li>
+          {% else %}
+          <li class="nav-item">
+            <a class="nav-link" href="/filter/skatewear/">Skatewear</a>
+          </li>
+          {% endif %}
+          <!-- Category 4 -->
+          {% if 'Deck' in request.session.category %}
+          <li class="nav-item active">
+            <a class="nav-link" href="/filter/deck/">Decks
+              <span class="sr-only">(current)</span>
+            </a>
+          </li>
+          {% else %}
+          <li class="nav-item">
+            <a class="nav-link" href="/filter/deck/">Decks</a>
+          </li>
+          {% endif %}
+
+        </ul>
+        <!-- Links -->
+
+        {% if 'search' in request.session %}
+        <span class="badge badge-pill info-color">{{ request.session.search }}</span>
+        <a href="/search/remove/">
+          <i class="fas fa-times-circle ml-2 text-muted"></i>
+        </a>
+        {% endif %}
+        <form action="/search/" method="POST" class="form-inline">
+          {% csrf_token %}
+          <div class="md-form my-0">
+            <input class="form-control mr-sm-2" type="text" placeholder="Search" aria-label="Search" name="search">
+            <input type="submit" hidden>
+          </div>
+        </form>
+      </div>
+      <!-- Collapsible content -->
+
+    </nav>
+    <!--/.Navbar-->
+
+    {% if messages %}
+    <ul class="messages list-unstyled mb-5 mt-5 text-center">
+      {% for message in messages %}
+      {% if 'error' in message.tags %}
+      <li {% if message.tags %} class="{{ message.tags }}" {% endif %}>{{ message }}</li>
+      {% endif %}
+      {% endfor %}
+    </ul>
+    {% endif %}
+
+    <!--Section: Products v.3-->
+    <section class="text-center mb-4">
+
+      {% for product in page_object %}
+      {% if forloop.first %}
+      <!--Grid row-->
+      <div class="row wow fadeIn">
+        {% endif %}
+
+        <!--Grid column-->
+        <div class="col-lg-3 col-md-6 mb-4">
+
+          <!--Card-->
+          <div class="card">
+
+            <!--Card image-->
+            {% if product.quantity < 1 %}
+            <div class="view">
+              <img src="{{ product.image.url }}" class="card-img-top" alt="">
+              <a href="/product/{{ product.id }}/">
+                <div class="mask flex-center rgba-black-strong">
+                  <h3 class="white-text">Out of stock</h3>
+                </div>
+              </a>
+            </div>
+            {% else %}
+            <div class="view overlay">
+              <img src="{{ product.image.url }}" class="card-img-top" alt="">
+              <a href="/product/{{ product.id }}/">
+                <div class="mask rgba-white-slight"></div>
+              </a>
+            </div>
+            {% endif %}
+            <!--Card image-->
+
+            <!--Card content-->
+            <div class="card-body text-center">
+              <!--Category & Title-->
+              <a href="" class="grey-text">
+                <h5>{{ product.category.name }}</h5>
+              </a>
+              <h5>
+                <strong>
+                  <a href="/product/{{ product.id }}/" class="dark-grey-text">{{ product.name }}
+                    {% if product.discount_price %}
+                    <span class="badge badge-pill primary-color">SALE</span>
+                    {% else %}
+                    <span class="badge badge-pill danger-color">NEW</span>
+                    {% endif %}
+                  </a>
+                </strong>
+              </h5>
+
+              <h4 class="font-weight-bold blue-text">
+                {% if product.discount_price %}
+                <strong>${{ product.discount_price }}</strong>
+                {% else %}
+                <strong>${{ product.price }}</strong>
+                {% endif %}
+              </h4>
+
+            </div>
+            <!--Card content-->
+
+          </div>
+          <!--Card-->
+
+        </div>
+        <!--Grid column-->
+        {% if forloop.counter|divisibleby:4 %}
+
+      </div>
+      <!--Grid row-->
+
+      <!--Grid row-->
+      <div class="row wow fadeIn">
+        {% endif %}
+        {% if forloop.last %}</div>{% endif %}
+      {% endfor %}
+
+    </section>
+    <!--Section: Products v.3-->
+
+    <!--Pagination-->
+    {% if page_object.paginator.num_pages > 1 %}
+    <nav class="d-flex justify-content-center wow fadeIn">
+      <ul class="pagination pg-dark">
+
+        <!--Arrow left-->
+        {% if page_object.has_previous %}
+        <li class="page-item">
+          <a class="page-link" href="?page={{ page_object.previous_page_number }}" aria-label="Previous">
+            <span aria-hidden="true">&laquo;</span>
+            <span class="sr-only">Previous</span>
+          </a>
+        </li>
+        {% else %}
+        <li class="page-item disabled">
+          <a class="page-link" href="" aria-label="Previous">
+            <span aria-hidden="true">&laquo;</span>
+            <span class="sr-only">Previous</span>
+          </a>
+        </li>
+        {% endif %}
+
+        {% for page in page_object.paginator.page_range %}
+        {% if forloop.counter <= 5 %}
+        {% if page == page_object.number %}
+        <li class="page-item active">
+          <a class="page-link" href="?page={{ forloop.counter }}">{{ forloop.counter }}
+            <span class="sr-only">(current)</span>
+          </a>
+        </li>
+        {% else %}
+        <li class="page-item">
+          <a class="page-link" href="?page={{ forloop.counter }}">{{ forloop.counter }}</a>
+        </li>
+        {% endif %}
+        {% endif %}
+        {% endfor %}
+
+        {% if page_object.has_next %}
+        <li class="page-item">
+          <a class="page-link" href="?page={{ page_object.next_page_number }}" aria-label="Next">
+            <span aria-hidden="true">&raquo;</span>
+            <span class="sr-only">Next</span>
+          </a>
+        </li>
+        {% else %}
+        <li class="page-item disabled">
+          <a class="page-link" href="" aria-label="Next">
+            <span aria-hidden="true">&raquo;</span>
+            <span class="sr-only">Next</span>
+          </a>
+        </li>
+        {% endif %}
+      </ul>
+    </nav>
+    <!--Pagination-->
+    {% endif %}
+
+  </div>
+</main>
+<!--Main layout-->
+{% endblock %}
